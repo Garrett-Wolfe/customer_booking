@@ -6,10 +6,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Mic, MicOff, Plus, MapPin, Mail } from "lucide-react";
-import React from "react";
 import EndCallAlert from "./EndCallAlert";
 
-export default function CustomerCard({ customer }) {
+export interface Customer {
+  name: string;
+  phone: string;
+  address: string;
+  email: string;
+  isNew: boolean;
+  isTalking: boolean;
+}
+
+export interface CustomerCardProps {
+  customer: Customer;
+}
+
+export default function CustomerCard({ customer }: CustomerCardProps) {
   const [isMuted, setIsMuted] = useState(false);
 
   const handleMuteToggle = () => {

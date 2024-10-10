@@ -13,9 +13,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { PhoneOff } from "lucide-react";
-import React from "react";
 
-export default function EndCallAlert({ onHangUp }) {
+export default function EndCallAlert({ onHangUp }: { onHangUp: () => void }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>

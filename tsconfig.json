@@ -21,6 +21,5 @@
       "@/server/*": ["server/*"]
     }
   },
-  "include": ["client/src", "server"],
-  "references": [{ "path": "./tsconfig.client.json" }, { "path": "./tsconfig.server.json" }]
+  "references": [{ "path": "client" }, { "path": "server" }]
 }

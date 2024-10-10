@@ -1,9 +1,12 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../tsconfig.json",
   "compilerOptions": {
+    "composite": true,
+    "esModuleInterop": true,
     "jsx": "react-jsx",
-    "noEmit": true,
+    "noEmit": false,
     "baseUrl": ".",
+    "outDir": "../dist/client",
     "paths": {
       "@/components/*": ["src/components/*"],
       "@/lib/*": ["src/lib/*"]

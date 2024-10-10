@@ -4,8 +4,11 @@ import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 
+import CustomerCard, { Customer } from "./CustomerCard";
+import WeeklyCalendar, { Schedule } from "./WeeklyCalendar";
+
 // Dummy data
-const customer = {
+const customer: Customer = {
   name: "Jane Doe",
   phone: "+1 (555) 123-4567",
   address: "123 Main St, Anytown, USA 12345",
@@ -14,11 +17,7 @@ const customer = {
   isTalking: true,
 };
 
-import CustomerCard from "./CustomerCard";
-import WeeklyCalendar from "./WeeklyCalendar";
-import React from "react";
-
-const schedules = [
+const schedules: Schedule[] = [
   { day: "Mon", jobs: [{ start: "10:00", end: "12:00", title: "Plumbing" }] },
   { day: "Tue", jobs: [{ start: "14:00", end: "16:00", title: "Electrical" }] },
   { day: "Wed", jobs: [] },
