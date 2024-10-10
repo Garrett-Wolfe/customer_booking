@@ -18,7 +18,13 @@ const customer: Customer = {
 };
 
 const schedules: Schedule[] = [
-  { day: "Mon", jobs: [{ start: "10:00", end: "12:00", title: "Plumbing" }] },
+  {
+    day: "Mon",
+    jobs: [
+      { start: "10:00", end: "12:00", title: "Plumbing" },
+      { start: "10:00", end: "12:00", title: "Plumbing2" },
+    ],
+  },
   { day: "Tue", jobs: [{ start: "14:00", end: "16:00", title: "Electrical" }] },
   { day: "Wed", jobs: [] },
   { day: "Thu", jobs: [{ start: "09:00", end: "11:00", title: "HVAC" }] },
@@ -33,27 +39,36 @@ export default function CallCenterPage() {
   return (
     <div className="min-h-screen bg-gray-900 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
-        <CustomerCard customer={customer} />
         <div className="flex flex-col md:flex-row md:items-start md:space-x-4">
-          <div className="flex-grow">
-            <WeeklyCalendar schedules={schedules} currentDate={date || new Date()} />
+          {/* Left Section - Customer Card and Weekly Calendar */}
+          <div className="flex flex-col md:w-2/3 space-y-4">
+            {/* Customer Card */}
+            <div className="flex-shrink-0">
+              <CustomerCard customer={customer} />
+            </div>
+            {/* Weekly Calendar */}
+            <div>
+              <WeeklyCalendar schedules={schedules} currentDate={date || new Date()} />
+            </div>
           </div>
-          <div className="mt-4 md:mt-0">
+
+          {/* Right Section - Calendar */}
+          <div className="md:w-1/3 md:self-start">
             <Card className="bg-gray-800 text-gray-100">
               <CardContent className="p-2">
                 <Calendar
                   mode="single"
                   selected={date}
                   onSelect={setDate}
-                  className="rounded-md border border-gray-700"
+                  className="rounded-md border border-gray-700 p-4"
                   classNames={{
                     day_selected:
-                      "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                    day_today: "bg-accent text-accent-foreground",
-                    day: "text-gray-100 hover:bg-accent hover:text-accent-foreground",
-                    head_cell: "text-muted-foreground",
-                    cell: "text-muted-foreground",
-                    nav_button: "hover:bg-accent",
+                      "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-lg p-2",
+                    day_today: "bg-accent text-accent-foreground rounded-lg p-2",
+                    day: "text-gray-100 hover:bg-accent hover:text-accent-foreground rounded-lg p-2",
+                    head_cell: "text-muted-foreground p-2",
+                    cell: "text-muted-foreground p-2",
+                    nav_button: "hover:bg-accent rounded-full p-1",
                     nav_button_previous: "absolute left-1",
                     nav_button_next: "absolute right-1",
                     caption: "relative flex items-center justify-center px-8",
