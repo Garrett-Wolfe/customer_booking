@@ -27,15 +27,22 @@ const schedules: Schedule[] = [
 
 // Dummy data
 let customer: Customer = {
-  name: "Jane Garcia",
+  name: "Bobby Garcia",
   phone: "(123) 456-7890",
-  address: "123 Main St, Anytown, USA 12345",
+  address: {
+    street: "123 Main St",
+    street_line_2: "",
+    city: "Anytown",
+    state: "CA",
+    zip: "12345",
+    country: "USA",
+  },
   email: "jane.garcia@gmail.com",
   isNew: true,
   isTalking: true,
 };
 
-customer.isNew = !(await customerExists(customer));
+// customer.isNew = !(await customerExists(customer));
 
 export default function CallCenterPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());

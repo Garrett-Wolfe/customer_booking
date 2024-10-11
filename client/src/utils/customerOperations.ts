@@ -5,6 +5,11 @@ function normalizePhoneNumber(phone: string): string {
   return phone.replace(/\D/g, "");
 }
 
+export const getCustomerAddressString = (customer: Customer): string => {
+  const { street, street_line_2, city, state, zip, country } = customer.address;
+  return `${street}${street_line_2 ? ", " + street_line_2 : ""}, ${city}, ${state} ${zip}, ${country}`;
+};
+
 export const customerExists = async (customer: Customer): Promise<boolean> => {
   try {
     const { email, name, phone } = customer;

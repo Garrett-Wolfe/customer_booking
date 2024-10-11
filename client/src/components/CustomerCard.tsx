@@ -8,6 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Mic, MicOff, Plus, MapPin, Mail } from "lucide-react";
 import EndCallAlert from "./EndCallAlert";
 import { Customer } from "../types/customer";
+import { getCustomerAddressString } from "../utils/customerOperations";
+import { createCustomer } from "../services/housecallProService";
 
 export interface CustomerCardProps {
   customer: Customer;
@@ -62,6 +64,7 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
             <p className="text-sm text-gray-400">{customer.phone}</p>
             {customer.isNew ? (
               <Badge
+                onClick={() => createCustomer(customer)}
                 variant="outline"
                 className="flex items-center space-x-1 bg-gray-700 hover:bg-gray-600 cursor-pointer transition-colors duration-200"
               >
@@ -78,7 +81,7 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
         <div className="mt-4 space-y-2">
           <p className="text-sm flex items-center">
             <MapPin className="h-4 w-4 mr-2" />
-            <span>{customer.address}</span>
+            <span>{getCustomerAddressString(customer)}</span>
           </p>
           <p className="text-sm flex items-center">
             <Mail className="h-4 w-4 mr-2" />
