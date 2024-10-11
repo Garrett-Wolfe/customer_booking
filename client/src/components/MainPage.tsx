@@ -1,26 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 
 import CustomerCard from "./CustomerCard";
-import WeeklyCalendar, { Schedule } from "./WeeklyCalendar";
+import WeeklyCalendar from "./WeeklyCalendar";
 import { customerExists } from "../utils/customerOperations";
 import { Customer } from "../types/customer";
+import { Schedule } from "../types/company";
+import { fetchJobsInWeek } from "../services/housecallProService";
 
-const schedules: Schedule[] = [
-  {
-    day: "Mon",
-    jobs: [
-      { start: "10:00", end: "12:00", title: "Plumbing" },
-      { start: "10:00", end: "12:00", title: "Plumbing2" },
-    ],
-  },
-  { day: "Tue", jobs: [{ start: "14:00", end: "16:00", title: "Electrical" }] },
+let dummySchedules: Schedule[] = [
+  { day: "Mon", jobs: [] },
+  { day: "Tue", jobs: [] },
   { day: "Wed", jobs: [] },
-  { day: "Thu", jobs: [{ start: "09:00", end: "11:00", title: "HVAC" }] },
-  { day: "Fri", jobs: [{ start: "13:00", end: "15:00", title: "Carpentry" }] },
+  { day: "Thu", jobs: [] },
+  { day: "Fri", jobs: [] },
   { day: "Sat", jobs: [] },
   { day: "Sun", jobs: [] },
 ];
@@ -42,10 +38,26 @@ let customer: Customer = {
   isTalking: true,
 };
 
-// customer.isNew = !(await customerExists(customer));
+customer.isNew = !(await customerExists(customer));
 
 export default function CallCenterPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [schedules, setSchedules] = useState<Schedule[]>(dummySchedules);
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      if (date) {
+        try {
+          const result = await fetchJobsInWeek(date);
+          setSchedules(result);
+        } catch (error) {
+          console.error("Error fetching jobs:", error);
+        }
+      }
+    };
+
+    fetchSchedules();
+  }, [date]);
 
   return (
     <div className="min-h-screen bg-gray-900 p-4">

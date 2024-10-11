@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mic, MicOff, Plus, MapPin, Mail } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "../components/ui/alert";
+import { Mic, MicOff, Plus, MapPin, Mail, X } from "lucide-react";
 import EndCallAlert from "./EndCallAlert";
 import { Customer } from "../types/customer";
 import { getCustomerAddressString } from "../utils/customerOperations";
@@ -17,6 +18,9 @@ export interface CustomerCardProps {
 
 export default function CustomerCard({ customer }: CustomerCardProps) {
   const [isMuted, setIsMuted] = useState(false);
+  const [isNewCustomer, setIsNewCustomer] = useState(customer.isNew);
+  const [error, setError] = useState<string | null>(null);
+  const [lockNewCustomer, setlockNewCustomer] = useState(false);
 
   const handleMuteToggle = () => {
     setIsMuted(!isMuted);
@@ -24,6 +28,23 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
 
   const handleHangUp = () => {
     console.log("Call ended");
+  };
+
+  const handleCreateCustomer = async () => {
+    try {
+      await createCustomer(customer);
+      setIsNewCustomer(false);
+      setlockNewCustomer(false);
+      setError(null);
+    } catch (error) {
+      console.error("Failed to create customer:", error);
+      setError("Failed to create customer.");
+      setlockNewCustomer(true);
+    }
+  };
+
+  const handleDismissError = () => {
+    setError(null);
   };
 
   return (
@@ -44,6 +65,17 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
         </div>
       </CardHeader>
       <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4 flex justify-between items-start">
+            <div>
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleDismissError}>
+              <X className="h-4 w-4" />
+            </Button>
+          </Alert>
+        )}
         <div className="flex items-center space-x-4">
           <div className="relative">
             <Avatar className="h-20 w-20">
@@ -62,11 +94,13 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
           <div className="space-y-1">
             <h3 className="text-xl font-semibold">{customer.name}</h3>
             <p className="text-sm text-gray-400">{customer.phone}</p>
-            {customer.isNew ? (
+            {isNewCustomer ? (
               <Badge
-                onClick={() => createCustomer(customer)}
+                onClick={lockNewCustomer ? undefined : handleCreateCustomer}
                 variant="outline"
-                className="flex items-center space-x-1 bg-gray-700 hover:bg-gray-600 cursor-pointer transition-colors duration-200"
+                className={`flex items-center space-x-1 ${
+                  lockNewCustomer ? "bg-gray-500 cursor-not-allowed" : "bg-gray-700 hover:bg-gray-600 cursor-pointer"
+                } transition-colors duration-200`}
               >
                 <span className="text-white">New Customer</span>
                 <Plus className="h-3 w-3 text-white" />
