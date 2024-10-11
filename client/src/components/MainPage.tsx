@@ -4,18 +4,10 @@ import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 
-import CustomerCard, { Customer } from "./CustomerCard";
+import CustomerCard from "./CustomerCard";
 import WeeklyCalendar, { Schedule } from "./WeeklyCalendar";
-
-// Dummy data
-const customer: Customer = {
-  name: "Jane Doe",
-  phone: "+1 (555) 123-4567",
-  address: "123 Main St, Anytown, USA 12345",
-  email: "jane.doe@example.com",
-  isNew: false,
-  isTalking: true,
-};
+import { customerExists } from "../utils/customerOperations";
+import { Customer } from "../types/customer";
 
 const schedules: Schedule[] = [
   {
@@ -33,6 +25,18 @@ const schedules: Schedule[] = [
   { day: "Sun", jobs: [] },
 ];
 
+// Dummy data
+let customer: Customer = {
+  name: "Jane Garcia",
+  phone: "(123) 456-7890",
+  address: "123 Main St, Anytown, USA 12345",
+  email: "jane.garcia@gmail.com",
+  isNew: true,
+  isTalking: true,
+};
+
+customer.isNew = !(await customerExists(customer));
+
 export default function CallCenterPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -42,11 +46,9 @@ export default function CallCenterPage() {
         <div className="flex flex-col md:flex-row md:items-start md:space-x-4">
           {/* Left Section - Customer Card and Weekly Calendar */}
           <div className="flex flex-col md:w-2/3 space-y-4">
-            {/* Customer Card */}
             <div className="flex-shrink-0">
               <CustomerCard customer={customer} />
             </div>
-            {/* Weekly Calendar */}
             <div>
               <WeeklyCalendar schedules={schedules} currentDate={date || new Date()} />
             </div>

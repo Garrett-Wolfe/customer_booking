@@ -7,15 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Mic, MicOff, Plus, MapPin, Mail } from "lucide-react";
 import EndCallAlert from "./EndCallAlert";
-
-export interface Customer {
-  name: string;
-  phone: string;
-  address: string;
-  email: string;
-  isNew: boolean;
-  isTalking: boolean;
-}
+import { Customer } from "../types/customer";
 
 export interface CustomerCardProps {
   customer: Customer;
