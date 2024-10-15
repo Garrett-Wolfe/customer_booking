@@ -12,13 +12,13 @@ import { Schedule } from "../types/company";
 import { fetchJobsInWeek } from "../services/housecallProService";
 
 let dummySchedules: Schedule[] = [
+  { day: "Sun", jobs: [] },
   { day: "Mon", jobs: [] },
   { day: "Tue", jobs: [] },
   { day: "Wed", jobs: [] },
   { day: "Thu", jobs: [] },
   { day: "Fri", jobs: [] },
   { day: "Sat", jobs: [] },
-  { day: "Sun", jobs: [] },
 ];
 
 // Dummy data
@@ -84,15 +84,18 @@ export default function CallCenterPage() {
                   className="rounded-md border border-gray-700 p-4"
                   classNames={{
                     day_selected:
-                      "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-lg p-2",
-                    day_today: "bg-accent text-accent-foreground rounded-lg p-2",
-                    day: "text-gray-100 hover:bg-accent hover:text-accent-foreground rounded-lg p-2",
-                    head_cell: "text-muted-foreground p-2",
-                    cell: "text-muted-foreground p-2",
+                      "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-lg w-10 h-10 m-0.5 flex items-center justify-center",
+                    day_today: "bg-accent text-accent-foreground rounded-lg w-10 h-10 m-0.5 flex items-center justify-center",
+                    day: "text-gray-100 hover:bg-accent hover:text-accent-foreground rounded-lg w-10 h-10 m-0.5 flex items-center justify-center",
+                    head_cell: "text-muted-foreground font-normal w-10 h-10 flex items-center justify-center",
+                    cell: "text-center p-0",
+                    row: "flex w-full mt-2",
+                    head: "flex w-full",
                     nav_button: "hover:bg-accent rounded-full p-1",
                     nav_button_previous: "absolute left-1",
                     nav_button_next: "absolute right-1",
-                    caption: "relative flex items-center justify-center px-8",
+                    caption: "relative flex items-center justify-center px-8 py-2",
+                    table: "w-full border-collapse space-y-1",
                   }}
                 />
               </CardContent>

@@ -101,13 +101,13 @@ export const fetchJobsInWeek = async (date: Date) => {
     console.log(jobs);
 
     const schedules: Schedule[] = [
+      { day: "Sun", jobs: [] },
       { day: "Mon", jobs: [] },
       { day: "Tue", jobs: [] },
       { day: "Wed", jobs: [] },
       { day: "Thu", jobs: [] },
       { day: "Fri", jobs: [] },
       { day: "Sat", jobs: [] },
-      { day: "Sun", jobs: [] },
     ];
 
     // Map jobs to the appropriate day in the schedule
