@@ -1,6 +1,7 @@
 import { Customer } from "src/types/customer";
 import apiClient from "../services/apiClient";
 import { Schedule } from "src/types/company";
+import { NewJob } from '../types/company';
 
 export const fetchCustomersByEmail = async (email: string) => {
   try {
@@ -16,14 +17,13 @@ export const fetchCustomersByEmail = async (email: string) => {
 
 export const fetchBookingWindows = async (date: Date) => {
   try {
-    const formattedDate = date.toISOString().split("T")[0]; // Format Date object as 'YYYY-MM-DD'
+    const formattedDate = date.toISOString().split("T")[0];
     const response = await apiClient.get("/company/schedule_availability/booking_windows", {
       params: {
         start_date: formattedDate,
         show_for_days: 7,
       },
     });
-    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching booking windows:", error);
@@ -31,7 +31,7 @@ export const fetchBookingWindows = async (date: Date) => {
   }
 };
 
-export const createCustomer = async (customer: Customer) => {
+export const createCustomer = async (customer: Customer): Promise<Customer> => {
   try {
     const [firstName, ...lastNameParts] = customer.name.split(" ");
     const lastName = lastNameParts.length > 0 ? lastNameParts.join(" ") : "";
@@ -66,7 +66,14 @@ export const createCustomer = async (customer: Customer) => {
       },
     });
 
-    return response.data;
+    const createdCustomer = response.data;
+
+    return {
+      ...customer,
+      id: createdCustomer.id,
+      addressId: createdCustomer.addresses[0]?.id || null,
+      isNew: false,
+    };
   } catch (error) {
     console.error("Error creating customer:", error);
     throw error;
@@ -81,12 +88,8 @@ export const fetchJobsInWeek = async (date: Date) => {
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to Sunday
 
-    console.log(`Start of week ${startOfWeek} end of week ${endOfWeek}`);
-
-    const formattedStartDate = startOfWeek.toISOString().split("T")[0]; // Format as 'YYYY-MM-DD'
-    const formattedEndDate = endOfWeek.toISOString().split("T")[0]; // Format as 'YYYY-MM-DD'
-
-    console.log(`Start of week ${formattedStartDate} end of week ${formattedEndDate}`);
+    const formattedStartDate = startOfWeek.toISOString().split("T")[0];
+    const formattedEndDate = endOfWeek.toISOString().split("T")[0];
 
     const response = await apiClient.get("/jobs", {
       params: {
@@ -98,8 +101,6 @@ export const fetchJobsInWeek = async (date: Date) => {
 
     const jobs = response.data.jobs;
 
-    console.log(jobs);
-
     const schedules: Schedule[] = [
       { day: "Sun", jobs: [] },
       { day: "Mon", jobs: [] },
@@ -110,28 +111,65 @@ export const fetchJobsInWeek = async (date: Date) => {
       { day: "Sat", jobs: [] },
     ];
 
-    // Map jobs to the appropriate day in the schedule
     jobs.forEach((job: { schedule: { scheduled_start: string; scheduled_end: string }; name: string }) => {
       const scheduledStart = new Date(job.schedule.scheduled_start);
-      const dayIndex = scheduledStart.getDay() === 0 ? 6 : scheduledStart.getDay() - 1; // Map Sunday (0) to index 6
-      const startTime = scheduledStart.toTimeString().split(" ")[0].substring(0, 5); // Get 'HH:MM'
-      const endTime = new Date(job.schedule.scheduled_end).toTimeString().split(" ")[0].substring(0, 5); // Get 'HH:MM'
+      const dayIndex = scheduledStart.getDay();
 
       schedules[dayIndex].jobs.push({
-        start: startTime,
-        end: endTime,
+        start: job.schedule.scheduled_start,
+        end: job.schedule.scheduled_end,
         title: job.name,
       });
 
       schedules[dayIndex].jobs.sort((a, b) => a.start.localeCompare(b.start));
     });
 
-    console.log("Shedules: ");
-    console.log(schedules);
-
     return schedules;
   } catch (error) {
     console.error("Error fetching jobs:", error);
+    throw error;
+  }
+};
+
+export const createJob = async ({ customerId, addressId, jobName, scheduledStart, scheduledEnd }: NewJob) => {
+  try {
+    const payload = {
+      invoice_number: 0,
+      customer_id: customerId,
+      address_id: addressId,
+      schedule: {
+        scheduled_start: scheduledStart.toISOString(),
+        scheduled_end: scheduledEnd.toISOString(),
+        arrival_window: 0
+      },
+      assigned_employee_ids: [],
+      line_items: [
+        {
+          name: jobName,
+          description: null,
+          unit_price: 0,
+          quantity: 1,
+          unit_cost: 0
+        }
+      ],
+      tags: [],
+      lead_source: null,
+      notes: null,
+      job_fields: {
+        job_type_id: null,
+        business_unit_id: null
+      }
+    };
+
+    const response = await apiClient.post("/jobs", payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error creating job:", error);
     throw error;
   }
 };

@@ -10,18 +10,15 @@ export const getCustomerAddressString = (customer: Customer): string => {
   return `${street}${street_line_2 ? ", " + street_line_2 : ""}, ${city}, ${state} ${zip}, ${country}`;
 };
 
-export const customerExists = async (customer: Customer): Promise<boolean> => {
+export const customerExists = async (customer: Customer): Promise<Customer> => {
   try {
     const { email, name, phone } = customer;
-    console.log(`customer data ${email}, ${name}, ${phone}`);
     const response = await fetchCustomersByEmail(email);
-
-    console.log(response);
 
     if (response.customers && response.customers.length > 0) {
       const [firstName, lastName] = name.split(" ");
 
-      // Iterate through customers to check if we have a match
+      // A customer exists if the name or phone number matches
       for (const apiCustomer of response.customers) {
         const isNameMatch =
           apiCustomer.first_name === name ||
@@ -34,14 +31,20 @@ export const customerExists = async (customer: Customer): Promise<boolean> => {
           apiCustomer.work_number === normalNumber;
 
         if (isNameMatch && isPhoneMatch) {
-          return true;
+          return {
+            ...customer,
+            id: apiCustomer.id,
+            addressId: apiCustomer.addresses[0].id,
+            isNew: false,
+          };
         }
       }
     }
 
-    return false;
+    // If no match is found
+    return { ...customer, isNew: true };
   } catch (error) {
     console.error("Error checking if customer exists:", error);
-    return false;
+    return { ...customer, isNew: true };
   }
 };

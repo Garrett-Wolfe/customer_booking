@@ -14,9 +14,10 @@ import { createCustomer } from "../services/housecallProService";
 
 export interface CustomerCardProps {
   customer: Customer;
+  onCustomerUpdate: (updatedCustomer: Customer) => void;
 }
 
-export default function CustomerCard({ customer }: CustomerCardProps) {
+export default function CustomerCard({ customer, onCustomerUpdate }: CustomerCardProps) {
   const [isMuted, setIsMuted] = useState(false);
   const [isNewCustomer, setIsNewCustomer] = useState(customer.isNew);
   const [error, setError] = useState<string | null>(null);
@@ -32,10 +33,11 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
 
   const handleCreateCustomer = async () => {
     try {
-      await createCustomer(customer);
+      const updatedCustomer = await createCustomer(customer);
       setIsNewCustomer(false);
       setlockNewCustomer(false);
       setError(null);
+      onCustomerUpdate(updatedCustomer);
     } catch (error) {
       console.error("Failed to create customer:", error);
       setError("Failed to create customer.");

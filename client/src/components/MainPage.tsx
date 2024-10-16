@@ -9,9 +9,10 @@ import WeeklyCalendar from "./WeeklyCalendar";
 import { customerExists } from "../utils/customerOperations";
 import { Customer } from "../types/customer";
 import { Schedule } from "../types/company";
-import { fetchJobsInWeek } from "../services/housecallProService";
+import { fetchJobsInWeek, createJob } from "../services/housecallProService";
+import { NewJob } from "../types/company";
 
-let dummySchedules: Schedule[] = [
+let emptySchedules: Schedule[] = [
   { day: "Sun", jobs: [] },
   { day: "Mon", jobs: [] },
   { day: "Tue", jobs: [] },
@@ -22,9 +23,11 @@ let dummySchedules: Schedule[] = [
 ];
 
 // Dummy data
-let customer: Customer = {
-  name: "Bobby Garcia",
+let incomingCustomer: Customer = {
+  id: null,
+  name: "Chris Pine",
   phone: "(123) 456-7890",
+  addressId: null,
   address: {
     street: "123 Main St",
     street_line_2: "",
@@ -33,29 +36,61 @@ let customer: Customer = {
     zip: "12345",
     country: "USA",
   },
-  email: "jane.garcia@gmail.com",
+  email: "chris.pine@gmail.com",
   isNew: true,
   isTalking: true,
 };
 
-customer.isNew = !(await customerExists(customer));
+incomingCustomer = await customerExists(incomingCustomer)
 
 export default function CallCenterPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [schedules, setSchedules] = useState<Schedule[]>(dummySchedules);
+  const [schedules, setSchedules] = useState<Schedule[]>(emptySchedules);
+  const [customer, setCustomer] = useState<Customer>(incomingCustomer);
 
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      if (date) {
-        try {
-          const result = await fetchJobsInWeek(date);
-          setSchedules(result);
-        } catch (error) {
-          console.error("Error fetching jobs:", error);
-        }
-      }
+  const handleScheduleJob = async (jobName: string, startTime: Date, endTime: Date) => {
+    if (!customer) {
+      console.error("No customer selected");
+      return;
+    }
+
+    if (!customer.id || !customer.addressId) {
+      console.error("Customer or address ID is missing");
+      return;
+    }
+
+    const newJob: NewJob = {
+      customerId: customer.id,
+      addressId: customer.addressId,
+      jobName: jobName,
+      scheduledStart: startTime,
+      scheduledEnd: endTime,
     };
 
+    try {
+      const createdJob = await createJob(newJob);
+      fetchSchedules();
+    } catch (error) {
+      console.error("Failed to create job:", error);
+    }
+  };
+
+  const fetchSchedules = async () => {
+    if (date) {
+      try {
+        const result = await fetchJobsInWeek(date);
+        setSchedules(result);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      }
+    }
+  };
+
+  const handleCustomerUpdate = (updatedCustomer: Customer) => {
+    setCustomer(updatedCustomer);
+  };
+
+  useEffect(() => {
     fetchSchedules();
   }, [date]);
 
@@ -66,10 +101,14 @@ export default function CallCenterPage() {
           {/* Left Section - Customer Card and Weekly Calendar */}
           <div className="flex flex-col md:w-2/3 space-y-4">
             <div className="flex-shrink-0">
-              <CustomerCard customer={customer} />
+              <CustomerCard customer={customer} onCustomerUpdate={handleCustomerUpdate} />
             </div>
             <div>
-              <WeeklyCalendar schedules={schedules} currentDate={date || new Date()} />
+              <WeeklyCalendar 
+                schedules={schedules} 
+                currentDate={date || new Date()} 
+                onScheduleJob={handleScheduleJob}
+              />
             </div>
           </div>
 
